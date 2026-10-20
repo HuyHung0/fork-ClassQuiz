@@ -4,6 +4,20 @@ SPDX-FileCopyrightText: 2023 Marlon W (Mawoka)
 SPDX-License-Identifier: MPL-2.0
 -->
 
+> **Fork notes:** this is a fork of [mawoka-myblock/ClassQuiz](https://github.com/mawoka-myblock/ClassQuiz).
+> `master` mirrors upstream; my changes live on `my-changes`.
+>
+> **To update from upstream:**
+> ```bash
+> git checkout master
+> git pull upstream master          # get the latest original code
+> git push origin master            # sync my fork's master
+> git checkout my-changes
+> git merge master                  # bring updates into my changes
+> git push                          # push to my fork
+> ```
+> If there's a conflict, fix the marked files, then `git add .` and `git commit`.
+
 <a href="https://github.com/mawoka-myblock/ClassQuiz/stargazers"><img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/mawoka-myblock/classquiz?style=for-the-badge"></a>
 <a href="https://github.com/mawoka-myblock/ClassQuiz/graphs/contributors"><img alt="GitHub contributors" src="https://img.shields.io/github/contributors/mawoka-myblock/classquiz?color=green&style=for-the-badge"></a>
 <a href="https://github.com/mawoka-myblock/ClassQuiz/network/members"><img alt="GitHub forks" src="https://img.shields.io/github/forks/mawoka-myblock/classquiz?style=for-the-badge"></a>
