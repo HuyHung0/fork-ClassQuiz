@@ -7,6 +7,13 @@ SPDX-License-Identifier: MPL-2.0
 > **Fork notes:** this is a fork of [mawoka-myblock/ClassQuiz](https://github.com/mawoka-myblock/ClassQuiz).
 > `master` mirrors upstream; my changes live on `my-changes`.
 >
+> First-time setup on Debian/Linux:
+> ```bash
+> cp example.env .env
+> sed -i "s/CHANGE_ME_SECRET_KEY/$(openssl rand -hex 32)/; s/CHANGE_ME_POSTGRES_PASSWORD/$(openssl rand -hex 24)/" .env
+> docker compose build && docker compose up -d
+> ```
+> Keep `.env` private and do not commit it.
 > **To update from upstream:**
 > ```bash
 > git checkout master
