@@ -24,9 +24,9 @@ services:
       - redis
 
     environment: &env_vars # --- DON'T CHANGE FROM HERE ---
-      DB_URL: "postgresql://postgres:classquiz@db:5432/classquiz" # DON'T CHANGE
+      DB_URL: "postgresql://postgres:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}@db:5432/classquiz" # DON'T CHANGE
       REDIS: "redis://redis:6379/0?decode_responses=True" # DON'T CHANGE
-      SECRET_KEY: "TOP_SECRET" # Don't change it manually, use the one-liner provided in the documentation
+      SECRET_KEY: "${SECRET_KEY:?Set SECRET_KEY in .env}" # Do not change manually; generate it in .env using the README command
       MAX_WORKERS: "1" # Very important and DON'T CHANGE
       ACCESS_TOKEN_EXPIRE_MINUTES: 30 # DON'T CHANGE
       MEILISEARCH_URL: "http://meilisearch:7700" # DON'T CHANGE
@@ -87,7 +87,7 @@ services:
       timeout: 5s
       retries: 5
     environment:
-      POSTGRES_PASSWORD: "classquiz"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}"
       POSTGRES_DB: "classquiz"
     volumes:
       - data:/var/lib/postgresql/data
