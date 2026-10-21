@@ -106,6 +106,12 @@ SPDX-License-Identifier: MPL-2.0
 		if (data.started) {
 			gameMeta.started = true;
 		}
+		// Save the new sid, otherwise the next rejoin is rejected
+		const cookie_data = Cookies.get('joined_game');
+		if (cookie_data) {
+			const joined = { ...JSON.parse(cookie_data), sid: socket.id };
+			Cookies.set('joined_game', JSON.stringify(joined), { expires: 3600 });
+		}
 	});
 
 	socket.on('game_not_found', () => {
