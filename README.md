@@ -42,6 +42,12 @@ SPDX-License-Identifier: MPL-2.0
 > docker compose start api worker
 > ```
 > This brings back the data, not the old version: `api` re-runs migrations when it starts.
+>
+> **To turn registration on/off:** set `REGISTRATION_DISABLED` in `.env` (`True` blocks sign-ups, `False` allows them; it defaults to `True` if missing), then `docker compose up -d`.
+>
+> The navbar's Register link is separate and only cosmetic. Leave `#ENV VITE_REGISTRATION_DISABLED=True` in `frontend/Dockerfile` commented out, as upstream has it: an upstream bug (missing `!` in `frontend/src/lib/navbar.svelte`) makes that *hide* the link. If the link reappears after an update, upstream has fixed the bug: uncomment the line and run `docker compose up -d --build`.
+>
+> To add a user while registration stays off: set `REGISTRATION_DISABLED=False` in `.env`, run `docker compose up -d`, sign up at `/account/register`, then set it back to `True` and run `docker compose up -d` again.
 
 <a href="https://github.com/mawoka-myblock/ClassQuiz/stargazers"><img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/mawoka-myblock/classquiz?style=for-the-badge"></a>
 <a href="https://github.com/mawoka-myblock/ClassQuiz/graphs/contributors"><img alt="GitHub contributors" src="https://img.shields.io/github/contributors/mawoka-myblock/classquiz?color=green&style=for-the-badge"></a>
