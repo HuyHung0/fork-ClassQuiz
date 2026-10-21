@@ -16,16 +16,32 @@ SPDX-License-Identifier: MPL-2.0
 > docker compose build && docker compose up -d
 > ```
 > Keep `.env` private and do not commit it.
+>
 > **To update from upstream:**
 > ```bash
+> # once per clone (remotes are not stored on GitHub, so a fresh clone only has origin):
+> git remote add upstream https://github.com/mawoka-myblock/ClassQuiz.git
+>
+> docker compose exec db pg_dump -U postgres classquiz > backup-$(date +%F).sql   # migrations run on start
 > git checkout master
 > git pull upstream master          # get the latest original code
 > git push origin master            # sync my fork's master
 > git checkout my-changes
 > git merge master                  # bring updates into my changes
 > git push                          # push to my fork
+> docker compose pull               # api/worker/proxy run from prebuilt images, not local code
+> docker compose up -d --build      # rebuild frontend and restart changed services
 > ```
 > If there's a conflict, fix the marked files, then `git add .` and `git commit`.
+>
+> **To restore a backup** (replaces all current data):
+> ```bash
+> docker compose stop api worker    # otherwise api recreates empty tables mid-restore
+> docker compose exec db psql -U postgres -c "DROP DATABASE classquiz WITH (FORCE);" -c "CREATE DATABASE classquiz;"
+> docker compose exec -T db psql -U postgres -d classquiz -v ON_ERROR_STOP=1 < backup-YYYY-MM-DD.sql
+> docker compose start api worker
+> ```
+> This brings back the data, not the old version: `api` re-runs migrations when it starts.
 
 <a href="https://github.com/mawoka-myblock/ClassQuiz/stargazers"><img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/mawoka-myblock/classquiz?style=for-the-badge"></a>
 <a href="https://github.com/mawoka-myblock/ClassQuiz/graphs/contributors"><img alt="GitHub contributors" src="https://img.shields.io/github/contributors/mawoka-myblock/classquiz?color=green&style=for-the-badge"></a>

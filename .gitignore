@@ -13,3 +13,4 @@ survey.json
 .coverage
 export_deta.py
 target/
+backup-*.sql
