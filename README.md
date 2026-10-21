@@ -4,50 +4,73 @@ SPDX-FileCopyrightText: 2023 Marlon W (Mawoka)
 SPDX-License-Identifier: MPL-2.0
 -->
 
-> **Fork notes:** this is a fork of [mawoka-myblock/ClassQuiz](https://github.com/mawoka-myblock/ClassQuiz).
-> `master` mirrors upstream; my changes live on `my-changes`.
->
-> First-time setup on Debian/Linux:
-> ```bash
-> cp example.env .env
-> sed -i "s/CHANGE_ME_SECRET_KEY/$(openssl rand -hex 32)/; s/CHANGE_ME_POSTGRES_PASSWORD/$(openssl rand -hex 24)/" .env
-> # Set ROOT_ADDRESS in .env to this server's LAN IP for local access,
-> # or its public domain/address for access over the Internet (no trailing slash).
-> docker compose build && docker compose up -d
-> ```
-> Keep `.env` private and do not commit it.
->
-> **To update from upstream:**
-> ```bash
-> # once per clone (remotes are not stored on GitHub, so a fresh clone only has origin):
-> git remote add upstream https://github.com/mawoka-myblock/ClassQuiz.git
->
-> docker compose exec db pg_dump -U postgres classquiz > backup-$(date +%F).sql   # migrations run on start
-> git checkout master
-> git pull upstream master          # get the latest original code
-> git push origin master            # sync my fork's master
-> git checkout my-changes
-> git merge master                  # bring updates into my changes
-> git push                          # push to my fork
-> docker compose pull               # api/worker/proxy run from prebuilt images, not local code
-> docker compose up -d --build      # rebuild frontend and restart changed services
-> ```
-> If there's a conflict, fix the marked files, then `git add .` and `git commit`.
->
-> **To restore a backup** (replaces all current data):
-> ```bash
-> docker compose stop api worker    # otherwise api recreates empty tables mid-restore
-> docker compose exec db psql -U postgres -c "DROP DATABASE classquiz WITH (FORCE);" -c "CREATE DATABASE classquiz;"
-> docker compose exec -T db psql -U postgres -d classquiz -v ON_ERROR_STOP=1 < backup-YYYY-MM-DD.sql
-> docker compose start api worker
-> ```
-> This brings back the data, not the old version: `api` re-runs migrations when it starts.
->
-> **To turn registration on/off:** set `REGISTRATION_DISABLED` in `.env` (`True` blocks sign-ups, `False` allows them; it defaults to `True` if missing), then `docker compose up -d`.
->
-> The navbar's Register link is separate and only cosmetic. Leave `#ENV VITE_REGISTRATION_DISABLED=True` in `frontend/Dockerfile` commented out, as upstream has it: an upstream bug (missing `!` in `frontend/src/lib/navbar.svelte`) makes that *hide* the link. If the link reappears after an update, upstream has fixed the bug: uncomment the line and run `docker compose up -d --build`.
->
-> To add a user while registration stays off: set `REGISTRATION_DISABLED=False` in `.env`, run `docker compose up -d`, sign up at `/account/register`, then set it back to `True` and run `docker compose up -d` again.
+## Fork notes
+
+Fork of [mawoka-myblock/ClassQuiz](https://github.com/mawoka-myblock/ClassQuiz). `master` mirrors upstream; my changes live on `my-changes`. Run all commands from the project folder.
+
+### First-time setup (Debian/Linux)
+
+```bash
+cp example.env .env
+sed -i "s/CHANGE_ME_SECRET_KEY/$(openssl rand -hex 32)/; s/CHANGE_ME_POSTGRES_PASSWORD/$(openssl rand -hex 24)/" .env
+# Set ROOT_ADDRESS in .env to this server's LAN IP for local access,
+# or its public domain/address for access over the Internet (no trailing slash).
+docker compose build && docker compose up -d
+```
+
+Keep `.env` private and do not commit it.
+
+### Common commands
+
+```bash
+docker compose ps                       # status
+docker compose logs -f --tail 100 api   # follow logs (api, worker, frontend, db, proxy)
+docker compose up -d                    # start, or apply .env changes
+docker compose up -d --build            # same, and rebuild the frontend
+docker compose restart api              # restart (doesn't apply .env changes)
+docker compose down                     # stop and remove containers (data is kept)
+docker compose exec db psql -U postgres -d classquiz                            # database shell
+docker compose exec db pg_dump -U postgres classquiz > backup-$(date +%F).sql   # back up the database
+docker image prune                      # delete old images left after updates
+```
+
+### Update from upstream
+
+```bash
+git remote add upstream https://github.com/mawoka-myblock/ClassQuiz.git        # once per clone
+docker compose exec db pg_dump -U postgres classquiz > backup-$(date +%F).sql   # migrations run on start
+git checkout master && git pull upstream master && git push origin master
+git checkout my-changes && git merge master && git push
+docker compose pull && docker compose up -d --build   # api/worker/proxy use prebuilt images
+```
+
+If there's a conflict, fix the marked files, then `git add .` and `git commit`.
+
+### Restore a backup
+
+Replaces all data. Backups hold the database only; uploaded images live in `./uploads`.
+
+```bash
+docker compose stop api worker
+docker compose exec db psql -U postgres -c "DROP DATABASE classquiz WITH (FORCE);" -c "CREATE DATABASE classquiz;"
+docker compose exec -T db psql -U postgres -d classquiz -v ON_ERROR_STOP=1 < backup-YYYY-MM-DD.sql
+docker compose start api worker
+```
+
+### Reset
+
+- Empty the database (all users and data): the restore steps without the third line.
+- Wipe everything (database, search index, uploads): `docker compose down -v && sudo rm -rf uploads && docker compose up -d`
+
+Afterwards, sign up with your own account first (see Registration): the oldest account is the admin.
+
+### Registration
+
+`REGISTRATION_DISABLED` in `.env`: `True` blocks sign-ups (the default), `False` allows them. Apply with `docker compose up -d`. To add a user, set it to `False`, sign up at `/account/register`, then set it back.
+
+Keep `#ENV VITE_REGISTRATION_DISABLED=True` in `frontend/Dockerfile` commented out: an upstream bug (missing `!` in `frontend/src/lib/navbar.svelte`) makes that hide the Register link. If the link reappears after an update, uncomment it and run `docker compose up -d --build`.
+
+---
 
 <a href="https://github.com/mawoka-myblock/ClassQuiz/stargazers"><img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/mawoka-myblock/classquiz?style=for-the-badge"></a>
 <a href="https://github.com/mawoka-myblock/ClassQuiz/graphs/contributors"><img alt="GitHub contributors" src="https://img.shields.io/github/contributors/mawoka-myblock/classquiz?color=green&style=for-the-badge"></a>
