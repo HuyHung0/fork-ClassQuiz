@@ -42,6 +42,7 @@ services:
       MAIL_USERNAME: "email@email@email.email"
       MAIL_SERVER: "smtp.email.email"
       SKIP_EMAIL_VERIFICATION: "True" # Does the user have to confirm its email by clicking a link?
+      REGISTRATION_DISABLED: "True" # Block new sign-ups (also set VITE_REGISTRATION_DISABLED in frontend/Dockerfile)
 
       # --- EXTERNAL API CONFIG ---
       # HCAPTCHA_KEY: ""
