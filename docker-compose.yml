@@ -16,6 +16,7 @@ services:
     environment:
       REDIS_URL: redis://redis:6379/0?decode_responses=True
       API_URL: http://api:80
+      ORIGIN: "${ROOT_ADDRESS:?Set ROOT_ADDRESS in .env}" # Without it, the frontend assumes https and its server-side API requests fail
   api:
     image: ghcr.io/mawoka-myblock/classquiz-backend:master
     restart: &restart always
