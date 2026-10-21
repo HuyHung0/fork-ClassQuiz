@@ -33,7 +33,7 @@ services:
       # -- DON'T CHANGE TILL HERE ---
 
       # --- GENERAL CONFIG ---
-      ROOT_ADDRESS: "https://classquiz.de" # CHANGE IT (without a "/" at the end)
+      ROOT_ADDRESS: "${ROOT_ADDRESS:?Set ROOT_ADDRESS in .env}" # LAN IP for local access, or public URL; no trailing slash
 
       # --- MAIL CONFIG ---
       MAIL_PORT: "587"

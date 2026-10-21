@@ -11,6 +11,8 @@ SPDX-License-Identifier: MPL-2.0
 > ```bash
 > cp example.env .env
 > sed -i "s/CHANGE_ME_SECRET_KEY/$(openssl rand -hex 32)/; s/CHANGE_ME_POSTGRES_PASSWORD/$(openssl rand -hex 24)/" .env
+> # Set ROOT_ADDRESS in .env to this server's LAN IP for local access,
+> # or its public domain/address for access over the Internet (no trailing slash).
 > docker compose build && docker compose up -d
 > ```
 > Keep `.env` private and do not commit it.
