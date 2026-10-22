@@ -70,6 +70,32 @@ Afterwards, sign up with your own account first (see Registration): the oldest a
 
 Keep `#ENV VITE_REGISTRATION_DISABLED=True` in `frontend/Dockerfile` commented out: an upstream bug (missing `!` in `frontend/src/lib/navbar.svelte`) makes that hide the Register link. If the link reappears after an update, uncomment it and run `docker compose up -d --build`.
 
+### Offline class mode
+
+Laptop wired to a Cudy AP3000 (AP mode), students on its Wi-Fi, no internet. Everyone uses `http://192.168.10.9:8000`, and the QR code points there.
+
+Why not a domain name with HTTPS: iPhones with "Limit IP Address Tracking" (iCloud Private Relay) look up names through Apple's servers instead of the network's DNS, so offline the name never resolves. Local IP addresses skip Private Relay. Joining and playing don't need HTTPS; only passkey login and the copy-link button do.
+
+One-time setup:
+
+1. Cudy DHCP (admin page: `http://192.168.10.254`): range `192.168.10.10`–`.250`, preferred DNS `192.168.10.9`, alternative DNS blank, client isolation off. Nothing answers DNS on the laptop, so phones show "No Internet Connection" and stay connected. Never use the Cudy itself as DNS: offline, it answers every name with its own address.
+2. Class network profile (`Wired connection 1` stays DHCP for normal use):
+   ```bash
+   sudo nmcli con add type ethernet ifname enp48s0 con-name classquiz-lan \
+     ipv4.method manual ipv4.addresses 192.168.10.9/24 \
+     ipv4.never-default yes connection.autoconnect no
+   ```
+3. In `.env`: `ROOT_ADDRESS=http://192.168.10.9:8000`.
+
+In class, with the cable in the Cudy:
+
+```bash
+nmcli con up classquiz-lan   # again after replugging the cable or restarting the Cudy
+docker compose up -d
+```
+
+Open `http://192.168.10.9:8000` on the laptop too, so the join address on the screen matches the QR code. Students join the Wi-Fi, turn off mobile data and scan the QR code. After class: `nmcli con up "Wired connection 1"`.
+
 ---
 
 <a href="https://github.com/mawoka-myblock/ClassQuiz/stargazers"><img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/mawoka-myblock/classquiz?style=for-the-badge"></a>
